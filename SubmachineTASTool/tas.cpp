@@ -63,8 +63,8 @@ void SaveInput() {
     COMDLG_FILTERSPEC filter[2] = {};
     filter[0].pszSpec = L"*.*";
     filter[0].pszName = L"Any *.*";
-    filter[1].pszSpec = L"*.json";
-    filter[1].pszName = L"JSON *.json";
+    filter[1].pszSpec = L"*.tas";
+    filter[1].pszName = L"TAS input *.tas";
     std::wstring saveFileName = GetSaveFile(L"Save Input", filter, 2, 1);
     if (saveFileName.empty())
         return;
@@ -92,8 +92,8 @@ void LoadInput() {
     COMDLG_FILTERSPEC filter[2] = {};
     filter[0].pszSpec = L"*.*";
     filter[0].pszName = L"Any *.*";
-    filter[1].pszSpec = L"*.json";
-    filter[1].pszName = L"JSON *.json";
+    filter[1].pszSpec = L"*.tas";
+    filter[1].pszName = L"TAS input *.tas";
     std::wstring loadFileName = GetOpenFile(L"Load Input", filter, 2, 1);
     if (loadFileName.empty())
         return;
@@ -168,6 +168,9 @@ DoUpdateFunc FakeDoIO = []() {
     else if (isKeyPressed[VirtualKey::vk_f9]) {
         frameStepping = !frameStepping;
         ChangedFrameStepping();
+    }
+    else if (isKeyPressed[VirtualKey::vk_f10]) {
+        stepNextFrame = true;
     }
     else if (frameStepping) {
         if (stepNextFrame) {
@@ -302,29 +305,59 @@ bool DrawTASGui() {
     if (!showGui)
         return showGui;
 
+    ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::Begin("TAS (F3)", &showGui);
 
     if (ImGui::Checkbox("Show windows cursor", &showWindowsCursor))
         ChangedShowWindowsCursor();
+    ImGui::SameLine();
+    ImGui::TextDisabled("(F4)");
     ImGui::NewLine();
 
+    if (!ImGui::BeginTable("Controls", 4, ImGuiTableFlags_SizingFixedFit))
+        return showGui;
+
+    ImGui::TableNextColumn();
     if (ImGui::Checkbox("Recording", &recording))
         ChangedRecording();
-    ImGui::SameLine();
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("(F5)");
+
+    ImGui::TableNextColumn();
     if (ImGui::Checkbox("Playing", &playing))
         ChangedPlaying();
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("(F6)");
+
+    ImGui::TableNextColumn();
     if (ImGui::Button("Save input"))
         SaveInput();
-    ImGui::SameLine();
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("(F7)");
+
+    ImGui::TableNextColumn();
     if (ImGui::Button("Load input"))
         LoadInput();
-    ImGui::NewLine();
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("(F8)");
 
+    ImGui::TableNextColumn();
+    ImGui::NewLine();
+    ImGui::TableNextRow();
+
+    ImGui::TableNextColumn();
     if (ImGui::Checkbox("Frame stepping", &frameStepping))
         ChangedFrameStepping();
-    ImGui::SameLine();
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("(F9)");
+
+    ImGui::TableNextColumn();
     if (ImGui::Button("Step frame"))
         stepNextFrame = true;
+    ImGui::TableNextColumn();
+    ImGui::TextDisabled("(F10)");
+
+    ImGui::EndTable();
 
     ImGui::End();
     return showGui;
