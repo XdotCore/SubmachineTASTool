@@ -4,7 +4,12 @@
 #include <iomanip>
 
 static void PrintAddress(std::string name, intptr_t ptr) {
+    std::ios oldState(nullptr);
+    oldState.copyfmt(std::cout);
+
     std::cout << name << ": 0x" << std::uppercase << std::setfill('0') << std::setw(8) << std::hex << ptr << std::endl;
+
+    std::cout.copyfmt(oldState);
 }
 
 template<typename T>
