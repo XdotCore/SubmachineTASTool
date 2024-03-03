@@ -130,24 +130,38 @@ void LoadInput() {
     }
 }
 
-void ChangedFrameStepping() {
+void ToggledFrameStepping() {
     if (frameStepping)
         stepFrame = false;
 }
 
 // TODO: not have the locations hardcoded
-DoIOFunc RealDoIO = (DoIOFunc)(0x1AEFD0);
-DoUpdateFunc RealDoUpdate = (DoUpdateFunc)(0x1AE2C0);
-DoDrawFunc RealDoDraw = (DoDrawFunc)(0x1AE970);
+VoidFunc RealMainLoop = (VoidFunc)(0x1AF8B0);
+// In MainLoop
+VoidFunc RealDoStep = (VoidFunc)(0x1AF190);
+//In DoStep
+VoidFunc RealDoIO = (VoidFunc)(0x1AEFD0);
+VoidFunc RealDoUpdate = (VoidFunc)(0x1AE2C0);
+VoidFunc RealDoDraw = (VoidFunc)(0x1AE970);
+
+// Gamemaker builtin funcs
 GMLFunc Real_randomise = (GMLFunc)(0x22EDB0);
 GMLFunc random_set_seed = (GMLFunc)(0x22ED10);
 
-DoUpdateFunc FakeDoIO = []() {
+VoidFunc FakeMainLoop = []() {
+    RealMainLoop();
+};
+
+VoidFunc FakeDoStep = []() {
+    RealDoStep();
+};
+
+VoidFunc FakeDoIO = []() {
     RealDoIO();
-    if (isKeyPressed[VirtualKey::vk_f3]) {
+    if (isKeyPressed[VirtualKey::vk_f1]) {
         showGui = !showGui;
     }
-    else if (isKeyPressed[VirtualKey::vk_f4]) {
+    else if (isKeyPressed[VirtualKey::vk_f2]) {
         showWindowsCursor = !showWindowsCursor;
         ChangedShowWindowsCursor();
     }
@@ -167,7 +181,7 @@ DoUpdateFunc FakeDoIO = []() {
     }
     else if (isKeyPressed[VirtualKey::vk_f9]) {
         frameStepping = !frameStepping;
-        ChangedFrameStepping();
+        ToggledFrameStepping();
     }
     else if (isKeyPressed[VirtualKey::vk_f10]) {
         stepNextFrame = true;
@@ -225,14 +239,14 @@ DoUpdateFunc FakeDoIO = []() {
     }
 };
 
-DoUpdateFunc FakeDoUpdate = []() {
+VoidFunc FakeDoUpdate = []() {
     if (frameStepping && !stepFrame)
         return;
 
     RealDoUpdate();
 };
 
-DoDrawFunc FakeDoDraw = []() {
+VoidFunc FakeDoDraw = []() {
     if (frameStepping && !stepFrame)
         return;
 
@@ -271,8 +285,11 @@ GMLFunc Fake_randomise = [](RValue* result, void* self, void* other, int argCoun
 };
 
 void AttachHooks() {
+
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
+    AttachGameHook("MainLoop", &RealMainLoop, FakeMainLoop);
+    AttachGameHook("DoStep", &RealDoStep, FakeDoStep);
     AttachGameHook("DoIO", &RealDoIO, FakeDoIO);
     AttachGameHook("DoUpdate", &RealDoUpdate, FakeDoUpdate);
     AttachGameHook("DoDraw", &RealDoDraw, FakeDoDraw);
@@ -305,13 +322,12 @@ bool DrawTASGui() {
     if (!showGui)
         return showGui;
 
-    ImGui::SetNextWindowSize(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::Begin("TAS (F3)", &showGui);
+    ImGui::Begin("TAS (F1)", &showGui, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
     if (ImGui::Checkbox("Show windows cursor", &showWindowsCursor))
         ChangedShowWindowsCursor();
     ImGui::SameLine();
-    ImGui::TextDisabled("(F4)");
+    ImGui::TextDisabled("(F2)");
     ImGui::NewLine();
 
     if (!ImGui::BeginTable("Controls", 4, ImGuiTableFlags_SizingFixedFit))
@@ -347,7 +363,7 @@ bool DrawTASGui() {
 
     ImGui::TableNextColumn();
     if (ImGui::Checkbox("Frame stepping", &frameStepping))
-        ChangedFrameStepping();
+        ToggledFrameStepping();
     ImGui::TableNextColumn();
     ImGui::TextDisabled("(F9)");
 
@@ -358,6 +374,9 @@ bool DrawTASGui() {
     ImGui::TextDisabled("(F10)");
 
     ImGui::EndTable();
+    ImGui::NewLine();
+
+    ImGui::Text("Mouse: x %d, y %d", *mouse_x, *mouse_y);
 
     ImGui::End();
     return showGui;
