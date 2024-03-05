@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <iostream>
 #include <d3d11.h>
-#include "detours/detours.h"
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_impl_win32.h"
@@ -155,11 +154,10 @@ PFN_D3D11_CREATE_DEVICE FakeD3D11CreateDevice = [](IDXGIAdapter* pAdapter, D3D_D
     RealIDXGISwapChain_Present = (IDXGISwapChain_PresentFunc)vtblPresent(dummySwapChain);
     RealIDXGISwapChain_ResizeBuffers = (IDXGISwapChain_ResizeBuffersFunc)vtblResizeBuffers(dummySwapChain);
 
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    BeginHooking();
     AttachHook("IDXGISwapChain.Present", &RealIDXGISwapChain_Present, FakeIDXGISwapChain_Present);
     AttachHook("IDXGISwapChain.ResizeBuffers", &RealIDXGISwapChain_ResizeBuffers, FakeIDXGISwapChain_ResizeBuffers);
-    DetourTransactionCommit();
+    CommitHooking();
 
     dummySwapChain->Release();
 
@@ -174,8 +172,7 @@ PFN_D3D11_CREATE_DEVICE FakeD3D11CreateDevice = [](IDXGIAdapter* pAdapter, D3D_D
 };
 
 void AttachImGuiHooks() {
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    BeginHooking();
     AttachHook("CreateWindowExW", &RealCreateWindowExW, FakeCreateWindowExW);
 
     HMODULE d3d11 = GetModuleHandle(L"d3d11.dll");
@@ -183,21 +180,20 @@ void AttachImGuiHooks() {
     RealD3D11CreateDevice = (PFN_D3D11_CREATE_DEVICE)GetProcAddress(d3d11, "D3D11CreateDevice");
     AttachHook("D3D11CreateDevice", &RealD3D11CreateDevice, FakeD3D11CreateDevice);
 
-    DetourTransactionCommit();
+    CommitHooking();
 }
 
 void DetachImGuiHooks() {
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    BeginHooking();
     DetachHook("CreateWindowExW", &RealCreateWindowExW, FakeCreateWindowExW);
 
     DetachHook("D3D11CreateDevice", &RealD3D11CreateDevice, FakeD3D11CreateDevice);
     DetachHook("IDXGISwapChain.Present", &RealIDXGISwapChain_Present, FakeIDXGISwapChain_Present);
     DetachHook("IDXGISwapChain.ResizeBuffers", &RealIDXGISwapChain_ResizeBuffers, FakeIDXGISwapChain_ResizeBuffers);
 
+    CommitHooking();
+
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
-
-    DetourTransactionCommit();
     ImGui::DestroyContext();
 }

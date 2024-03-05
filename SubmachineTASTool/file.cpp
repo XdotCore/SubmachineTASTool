@@ -59,7 +59,7 @@ std::wstring GetFile(IFileDialog* dialog, std::wstring title, COMDLG_FILTERSPEC*
     return filePath;
 }
 
-std::wstring GetSaveFile(std::wstring title, COMDLG_FILTERSPEC* filter, int filterCount, int defaultFilter) {
+std::wstring GetSaveFile(std::wstring title, COMDLG_FILTERSPEC* filter, int filterCount, int defaultFilter = 0) {
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr)) {
         std::cout << "Failed to save input because failed to init COM library" << std::endl;
@@ -81,7 +81,7 @@ std::wstring GetSaveFile(std::wstring title, COMDLG_FILTERSPEC* filter, int filt
     return filePath;
 }
 
-std::wstring GetOpenFile(std::wstring title, COMDLG_FILTERSPEC* filter, int filterCount, int defaultFilter) {
+std::wstring GetOpenFile(std::wstring title, COMDLG_FILTERSPEC* filter, int filterCount, int defaultFilter = 0) {
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr)) {
         std::cout << "Failed to open input because failed to init COM library" << std::endl;

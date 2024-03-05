@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <shobjidl.h> 
 #include <fstream>
 #include <iostream>
 #include <format>
@@ -8,7 +7,6 @@
 #include <iterator>
 #include <string>
 #include <sstream>
-#include "detours/detours.h"
 #include "imgui.h"
 #include "hooking.h"
 #include "tas.h"
@@ -286,15 +284,14 @@ GMLFunc Fake_randomise = [](RValue* result, void* self, void* other, int argCoun
 
 void AttachHooks() {
 
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    BeginHooking();
     AttachGameHook("MainLoop", &RealMainLoop, FakeMainLoop);
     AttachGameHook("DoStep", &RealDoStep, FakeDoStep);
     AttachGameHook("DoIO", &RealDoIO, FakeDoIO);
     AttachGameHook("DoUpdate", &RealDoUpdate, FakeDoUpdate);
     AttachGameHook("DoDraw", &RealDoDraw, FakeDoDraw);
     AttachGameHook("randomise", &Real_randomise, Fake_randomise);
-    DetourTransactionCommit();
+    CommitHooking();
 
     AttachGameNoHook("hCursor", &hCursor);
     AttachGameNoHook("isKeyReleased", &isKeyReleased);
@@ -309,13 +306,12 @@ void AttachHooks() {
 }
 
 void DetachHooks() {
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
+    BeginHooking();
     DetachHook("DoIO", &RealDoIO, FakeDoIO);
     DetachHook("DoUpdate", &RealDoUpdate, FakeDoUpdate);
     DetachHook("DoDraw", &RealDoDraw, FakeDoDraw);
     DetachHook("randomise", &Real_randomise, Fake_randomise);
-    DetourTransactionCommit();
+    CommitHooking();
 }
 
 bool DrawTASGui() {
