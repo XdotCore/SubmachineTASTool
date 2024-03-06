@@ -77,7 +77,7 @@ namespace GM {
         FNGetOwnProperty m_GetOwnProperty;
         FNDeleteProperty m_DeleteProperty;
         FNDefineOwnProperty m_DefineOwnProperty;
-        b* m_YYVarsMap;
+        CHashMap<int, RValue>* m_YYVarsMap;
         CWeakRef** m_WeakRef;
         unsigned __int32 m_WeakRefCount;
         unsigned __int32 m_VariableCount;
