@@ -103,6 +103,9 @@
       <ModuleDefinitionFile>version.def</ModuleDefinitionFile>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "C:\Users\xande\Games\steam\steamapps\common\submachine"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -125,6 +128,9 @@
       <ModuleDefinitionFile>version.def</ModuleDefinitionFile>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "C:\Users\xande\Games\steam\steamapps\common\submachine"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -143,6 +149,9 @@
       <ModuleDefinitionFile>version.def</ModuleDefinitionFile>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "C:\Users\xande\Games\steam\steamapps\common\submachine"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -165,11 +174,18 @@
       <ModuleDefinitionFile>version.def</ModuleDefinitionFile>
       <AdditionalDependencies>d3d11.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "C:\Users\xande\Games\steam\steamapps\common\submachine"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dxvtables.cpp" />
     <ClCompile Include="file.cpp" />
+    <ClCompile Include="GameMaker\croom.cpp" />
+    <ClCompile Include="GameMaker\gmflowfuncs.cpp" />
+    <ClCompile Include="GameMaker\gmlbuiltinfuncs.cpp" />
+    <ClCompile Include="GameMaker\inputgm.cpp" />
     <ClCompile Include="imguihooks.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="tas.cpp" />
@@ -184,11 +200,31 @@
   <ItemGroup>
     <ClInclude Include="dxvtables.h" />
     <ClInclude Include="file.h" />
+    <ClInclude Include="GameMaker\carraystructure.h" />
+    <ClInclude Include="GameMaker\ccode.h" />
+    <ClInclude Include="GameMaker\cevent.h" />
+    <ClInclude Include="GameMaker\chashmap.h" />
+    <ClInclude Include="GameMaker\cinstance.fwd.h" />
+    <ClInclude Include="GameMaker\cinstance.h" />
+    <ClInclude Include="GameMaker\clayer.h" />
+    <ClInclude Include="GameMaker\cobjectgm.h" />
+    <ClInclude Include="GameMaker\cphysicsdatagm.h" />
+    <ClInclude Include="GameMaker\cphysicsobject.h" />
+    <ClInclude Include="GameMaker\croom.h" />
+    <ClInclude Include="GameMaker\cscript.h" />
+    <ClInclude Include="GameMaker\cskeletoninstance.h" />
+    <ClInclude Include="GameMaker\gmbuiltinfuncs.h" />
+    <ClInclude Include="GameMaker\gmflowfuncs.h" />
+    <ClInclude Include="GameMaker\inputgm.h" />
+    <ClInclude Include="GameMaker\linkedlist.h" />
+    <ClInclude Include="GameMaker\rtoken.h" />
+    <ClInclude Include="GameMaker\rvalue.fwd.h" />
+    <ClInclude Include="GameMaker\rvalue.h" />
+    <ClInclude Include="GameMaker\yyrect.h" />
     <ClInclude Include="hooking.h" />
     <ClInclude Include="imguihooks.h" />
-    <ClInclude Include="tas.h" />
     <ClInclude Include="input.h" />
-    <ClInclude Include="rvalue.h" />
+    <ClInclude Include="tas.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

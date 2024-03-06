@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\GameMaker">
+      <UniqueIdentifier>{5bce3828-0256-43a7-9090-39a33ca99c4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\GameMaker">
+      <UniqueIdentifier>{01b20e00-f991-4ebe-a863-124ce03c8510}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -33,6 +39,18 @@
     <ClCompile Include="input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameMaker\inputgm.cpp">
+      <Filter>Source Files\GameMaker</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMaker\gmflowfuncs.cpp">
+      <Filter>Source Files\GameMaker</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMaker\gmlbuiltinfuncs.cpp">
+      <Filter>Source Files\GameMaker</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMaker\croom.cpp">
+      <Filter>Source Files\GameMaker</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <MASM Include="callTrueFunctionPtr.asm">
@@ -51,12 +69,6 @@
     <ClInclude Include="tas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rvalue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="imguihooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -68,6 +80,72 @@
     </ClInclude>
     <ClInclude Include="file.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\carraystructure.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\ccode.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cevent.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\chashmap.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cinstance.fwd.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cinstance.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\clayer.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cobjectgm.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cphysicsdatagm.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cphysicsobject.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\croom.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cscript.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\cskeletoninstance.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\linkedlist.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\rtoken.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\rvalue.fwd.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\rvalue.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\yyrect.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\inputgm.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\gmflowfuncs.h">
+      <Filter>Header Files\GameMaker</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMaker\gmbuiltinfuncs.h">
+      <Filter>Header Files\GameMaker</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

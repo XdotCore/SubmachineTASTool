@@ -4,6 +4,8 @@
 #include <iostream>
 #include <map>
 
+using namespace GM;
+
 std::map<MouseButton, std::string> MouseButtonNames = {
 	{ MouseButton::mb_any, "mb_any" },
 	{ MouseButton::mb_none, "mb_none" },
@@ -230,16 +232,6 @@ VirtualKey GetKeyFromName(std::string name) {
 	return NameToKey[name];
 }
 
-bool* isKeyReleased = (bool*)(0xB64AA0);
-bool* isKeyPressed = (bool*)(0x0B64BA0);
-bool* isKeyDown = (bool*)(0xB64CD0);
-bool* isMouseButtonReleased = (bool*)(0xB65210);
-bool* isMouseButtonPressed = (bool*)(0xB65290);
-bool* isMouseButtonDown = (bool*)(0xB65250);
-int* mouse_x = (int*)(0xB64A60);
-int* mouse_y = (int*)(0xB64A30);
-HCURSOR* hCursor = (HCURSOR*)(0xB57D38);
-
 std::string FrameInput::Serialize() const {
 	std::stringstream text;
 
@@ -276,8 +268,8 @@ std::string FrameInput::Serialize() const {
 		text << "end" << '\n';
 	}
 	text << "mouse" << '\n';
-	text << "x " << mouse_x << '\n';
-	text << "y " << mouse_y << '\n';
+	text << "x " << mouseX << '\n';
+	text << "y " << mouseY << '\n';
 	text << "end" << '\n';
 
 	return text.str();
@@ -358,9 +350,9 @@ void FrameInput::Unserialize(std::ifstream& loadFile) {
 					break;
 
 				if (line.starts_with("x "))
-					mouse_x = std::stoi(line.substr(2));
+					mouseX = std::stoi(line.substr(2));
 				else if (line.starts_with("y "))
-					mouse_y = std::stoi(line.substr(2));
+					mouseY = std::stoi(line.substr(2));
 			}
 		}
 	}

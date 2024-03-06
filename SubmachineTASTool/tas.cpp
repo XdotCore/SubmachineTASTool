@@ -12,6 +12,10 @@
 #include "tas.h"
 #include "input.h"
 #include "file.h"
+#include "GameMaker/ccode.h"
+#include "GameMaker/croom.h"
+#include "GameMaker/gmflowfuncs.h"
+#include "GameMaker/gmbuiltinfuncs.h"
 
 bool showGui = true;
 bool showWindowsCursor = false;
@@ -29,8 +33,8 @@ bool stepFrame = false;
 bool stepNextFrame = false;
 
 void ChangedShowWindowsCursor() {
-    *hCursor = showWindowsCursor ? LoadCursor(NULL, IDC_ARROW) : NULL;
-    SetCursor(*hCursor);
+    *GM::hCursor = showWindowsCursor ? LoadCursor(NULL, IDC_ARROW) : NULL;
+    SetCursor(*GM::hCursor);
 }
 
 void ChangedRecording() {
@@ -133,55 +137,42 @@ void ToggledFrameStepping() {
         stepFrame = false;
 }
 
-// TODO: not have the locations hardcoded
-VoidFunc RealMainLoop = (VoidFunc)(0x1AF8B0);
-// In MainLoop
-VoidFunc RealDoStep = (VoidFunc)(0x1AF190);
-//In DoStep
-VoidFunc RealDoIO = (VoidFunc)(0x1AEFD0);
-VoidFunc RealDoUpdate = (VoidFunc)(0x1AE2C0);
-VoidFunc RealDoDraw = (VoidFunc)(0x1AE970);
-
-// Gamemaker builtin funcs
-GMLFunc Real_randomise = (GMLFunc)(0x22EDB0);
-GMLFunc random_set_seed = (GMLFunc)(0x22ED10);
-
-VoidFunc FakeMainLoop = []() {
-    RealMainLoop();
+GM::VoidFunc FakeMainLoop = []() {
+    GM::MainLoop();
 };
 
-VoidFunc FakeDoStep = []() {
-    RealDoStep();
+GM::VoidFunc FakeDoStep = []() {
+    GM::DoStep();
 };
 
-VoidFunc FakeDoIO = []() {
-    RealDoIO();
-    if (isKeyPressed[VirtualKey::vk_f1]) {
+GM::VoidFunc FakeDoIO = []() {
+    GM::DoIO();
+    if (GM::isKeyPressed[GM::VirtualKey::vk_f1]) {
         showGui = !showGui;
     }
-    else if (isKeyPressed[VirtualKey::vk_f2]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f2]) {
         showWindowsCursor = !showWindowsCursor;
         ChangedShowWindowsCursor();
     }
-    else if (isKeyPressed[VirtualKey::vk_f5]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f5]) {
         recording = !recording;
         ChangedRecording();
     }
-    else if (isKeyPressed[VirtualKey::vk_f6]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f6]) {
         playing = !playing;
         ChangedPlaying();
     }
-    else if (isKeyPressed[VirtualKey::vk_f7]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f7]) {
         SaveInput();
     }
-    else if (isKeyPressed[VirtualKey::vk_f8]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f8]) {
         LoadInput();
     }
-    else if (isKeyPressed[VirtualKey::vk_f9]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f9]) {
         frameStepping = !frameStepping;
         ToggledFrameStepping();
     }
-    else if (isKeyPressed[VirtualKey::vk_f10]) {
+    else if (GM::isKeyPressed[GM::VirtualKey::vk_f10]) {
         stepNextFrame = true;
     }
     else if (frameStepping) {
@@ -190,8 +181,8 @@ VoidFunc FakeDoIO = []() {
             stepFrame = true;
         }
         else if (!stepFrame) {
-            if (std::any_of(isKeyPressed, &isKeyPressed[255], [](bool key) { return key; }) ||
-                std::any_of(isMouseButtonPressed, &isMouseButtonPressed[4], [](bool key) { return key; }))
+            if (std::any_of(GM::isKeyPressed, &GM::isKeyPressed[255], [](bool key) { return key; }) ||
+                std::any_of(GM::isMouseButtonPressed, &GM::isMouseButtonPressed[4], [](bool key) { return key; }))
                 stepFrame = true;
         }
         else
@@ -204,15 +195,15 @@ VoidFunc FakeDoIO = []() {
     if (recording) {
         FrameInput frameInput = {};
 
-        memcpy_s(frameInput.isKeyPressed, 256, isKeyPressed, 256);
-        memcpy_s(frameInput.isKeyReleased, 256, isKeyReleased, 256);
-        memcpy_s(frameInput.isKeyDown, 256, isKeyDown, 256);
-        memcpy_s(frameInput.isMouseButtonPressed, 5, isMouseButtonPressed, 5);
-        memcpy_s(frameInput.isMouseButtonReleased, 5, isMouseButtonReleased, 5);
-        memcpy_s(frameInput.isMouseButtonDown, 5, isMouseButtonDown, 5);
+        memcpy_s(frameInput.isKeyPressed, 256, GM::isKeyPressed, 256);
+        memcpy_s(frameInput.isKeyReleased, 256, GM::isKeyReleased, 256);
+        memcpy_s(frameInput.isKeyDown, 256, GM::isKeyDown, 256);
+        memcpy_s(frameInput.isMouseButtonPressed, 5, GM::isMouseButtonPressed, 5);
+        memcpy_s(frameInput.isMouseButtonReleased, 5, GM::isMouseButtonReleased, 5);
+        memcpy_s(frameInput.isMouseButtonDown, 5, GM::isMouseButtonDown, 5);
 
-        frameInput.mouse_x = *mouse_x;
-        frameInput.mouse_y = *mouse_y;
+        frameInput.mouseX = *GM::mouseX;
+        frameInput.mouseY = *GM::mouseY;
 
         inputRecording.push_back(frameInput);
     }
@@ -224,93 +215,88 @@ VoidFunc FakeDoIO = []() {
         else {
             FrameInput frameInput = inputRecording[frame++];
 
-            memcpy_s(isKeyPressed, 256, frameInput.isKeyPressed, 256);
-            memcpy_s(isKeyReleased, 256, frameInput.isKeyReleased, 256);
-            memcpy_s(isKeyDown, 256, frameInput.isKeyDown, 256);
-            memcpy_s(isMouseButtonPressed, 5, frameInput.isMouseButtonPressed, 5);
-            memcpy_s(isMouseButtonReleased, 5, frameInput.isMouseButtonReleased, 5);
-            memcpy_s(isMouseButtonDown, 5, frameInput.isMouseButtonDown, 5);
+            memcpy_s(GM::isKeyPressed, 256, frameInput.isKeyPressed, 256);
+            memcpy_s(GM::isKeyReleased, 256, frameInput.isKeyReleased, 256);
+            memcpy_s(GM::isKeyDown, 256, frameInput.isKeyDown, 256);
+            memcpy_s(GM::isMouseButtonPressed, 5, frameInput.isMouseButtonPressed, 5);
+            memcpy_s(GM::isMouseButtonReleased, 5, frameInput.isMouseButtonReleased, 5);
+            memcpy_s(GM::isMouseButtonDown, 5, frameInput.isMouseButtonDown, 5);
 
-            *mouse_x = frameInput.mouse_x;
-            *mouse_y = frameInput.mouse_y;
+            *GM::mouseX = frameInput.mouseX;
+            *GM::mouseY = frameInput.mouseY;
         }
     }
 };
 
-VoidFunc FakeDoUpdate = []() {
+GM::VoidFunc FakeDoUpdate = []() {
     if (frameStepping && !stepFrame)
         return;
 
-    RealDoUpdate();
+    GM::DoUpdate();
 };
 
-VoidFunc FakeDoDraw = []() {
+GM::VoidFunc FakeDoDraw = []() {
     if (frameStepping && !stepFrame)
         return;
 
-    RealDoDraw();
+    GM::DoDraw();
 };
 
-GMLFunc Fake_randomise = [](RValue* result, void* self, void* other, int argCount, RValue* args) {
+GM::BuiltinFunc Fake_randomise = [](GM::RValue* result, GM::CInstance* self, GM::CInstance* other, int argCount, GM::RValue* args) {
     if (recording) {
-        Real_randomise(result, self, other, argCount, args);
+        GM::randomise(result, self, other, argCount, args);
         unsigned int seed = (unsigned int)result->value.val;
-        std::cout << "recording seed: " << seed << std::endl;
-        std::cout << "recording seed: " << result->value.val << std::endl;
-        std::cout << "recording seed: " << result->value.v32 << std::endl;
-        std::cout << "recording seed: " << result->value.v64 << std::endl;
         inputRandomSeeds.push_back(seed);
     }
     else if (playing) {
         if (seedIndex >= inputRandomSeeds.size()) {
             playing = false;
-            std::cout << "Stop playing input..." << std::endl;
         }
         else {
             unsigned int seed = inputRandomSeeds[seedIndex++];
-            std::cout << "playing seed: " << seed << std::endl;
-            RValue _result = {};
-            RValue _args = {};
-            _args.kind = ValueType::Real;
+            GM::RValue _result = {};
+            GM::RValue _args = {};
+            _args.kind = GM::ValueType::Real;
             _args.value.val = (double)seed;
-            random_set_seed(&_result, nullptr, nullptr, 1, &_args);
-            result->kind = ValueType::Real;
+            GM::random_set_seed(&_result, nullptr, nullptr, 1, &_args);
+            result->kind = GM::ValueType::Real;
             result->value.val = (double)seed;
         }
     }
     else
-        Real_randomise(result, self, other, argCount, args);
+        GM::randomise(result, self, other, argCount, args);
 };
 
 void AttachHooks() {
 
     BeginHooking();
-    AttachGameHook("MainLoop", &RealMainLoop, FakeMainLoop);
-    AttachGameHook("DoStep", &RealDoStep, FakeDoStep);
-    AttachGameHook("DoIO", &RealDoIO, FakeDoIO);
-    AttachGameHook("DoUpdate", &RealDoUpdate, FakeDoUpdate);
-    AttachGameHook("DoDraw", &RealDoDraw, FakeDoDraw);
-    AttachGameHook("randomise", &Real_randomise, Fake_randomise);
+    AttachGameHook("MainLoop", &GM::MainLoop, FakeMainLoop);
+    AttachGameHook("DoStep", &GM::DoStep, FakeDoStep);
+    AttachGameHook("DoIO", &GM::DoIO, FakeDoIO);
+    AttachGameHook("DoUpdate", &GM::DoUpdate, FakeDoUpdate);
+    AttachGameHook("DoDraw", &GM::DoDraw, FakeDoDraw);
+    AttachGameHook("randomise", &GM::randomise, Fake_randomise);
     CommitHooking();
 
-    AttachGameNoHook("hCursor", &hCursor);
-    AttachGameNoHook("isKeyReleased", &isKeyReleased);
-    AttachGameNoHook("isKeyPressed", &isKeyPressed);
-    AttachGameNoHook("isKeyDown", &isKeyDown);
-    AttachGameNoHook("isMouseButtonReleased", &isMouseButtonReleased);
-    AttachGameNoHook("isMouseButtonPressed", &isMouseButtonPressed);
-    AttachGameNoHook("isMouseButtonDown", &isMouseButtonDown);
-    AttachGameNoHook("mouse_x", &mouse_x);
-    AttachGameNoHook("mouse_y", &mouse_y);
-    AttachGameNoHook("random_set_seed", &random_set_seed);
+    AttachGameNoHook("hCursor", &GM::hCursor);
+    AttachGameNoHook("isKeyReleased", &GM::isKeyReleased);
+    AttachGameNoHook("isKeyPressed", &GM::isKeyPressed);
+    AttachGameNoHook("isKeyDown", &GM::isKeyDown);
+    AttachGameNoHook("isMouseButtonReleased", &GM::isMouseButtonReleased);
+    AttachGameNoHook("isMouseButtonPressed", &GM::isMouseButtonPressed);
+    AttachGameNoHook("isMouseButtonDown", &GM::isMouseButtonDown);
+    AttachGameNoHook("mouseX", &GM::mouseX);
+    AttachGameNoHook("mouseY", &GM::mouseY);
+    AttachGameNoHook("currentRoom", &GM::currentRoom);
+    AttachGameNoHook("random_set_seed", &GM::random_set_seed);
 }
 
 void DetachHooks() {
     BeginHooking();
-    DetachHook("DoIO", &RealDoIO, FakeDoIO);
-    DetachHook("DoUpdate", &RealDoUpdate, FakeDoUpdate);
-    DetachHook("DoDraw", &RealDoDraw, FakeDoDraw);
-    DetachHook("randomise", &Real_randomise, Fake_randomise);
+    DetachHook("DoIO", &GM::DoIO, FakeDoIO);
+    DetachHook("DoUpdate", &GM::DoUpdate, FakeDoUpdate);
+    DetachHook("DoDraw", &GM::DoDraw, FakeDoDraw);
+    DetachHook("randomise", &GM::randomise, Fake_randomise);
     CommitHooking();
 }
 
@@ -372,7 +358,8 @@ bool DrawTASGui() {
     ImGui::EndTable();
     ImGui::NewLine();
 
-    ImGui::Text("Mouse: x %d, y %d", *mouse_x, *mouse_y);
+    ImGui::Text("Current Room: %s", (*GM::currentRoom)->m_Name);
+    ImGui::Text("Mouse: x %d, y %d", *GM::mouseX, *GM::mouseY);
 
     ImGui::End();
     return showGui;
